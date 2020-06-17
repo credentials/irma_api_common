@@ -46,6 +46,7 @@ public class AttributeDisjuctionSerializer
 	public JsonElement serialize(AttributeDisjunction src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject object = new JsonObject();
 		object.addProperty("label", src.getLabel());
+		object.addProperty("optional", src.isOptional());
 
 		if (src.hasValues()) { // Serialize it as a map
 			JsonObject map = new JsonObject();
@@ -67,8 +68,12 @@ public class AttributeDisjuctionSerializer
 		try {
 			JsonObject object = json.getAsJsonObject();
 			String label = object.get("label").getAsString();
+			JsonElement optionalEl = object.get("optional");
+			boolean optional = false;
+			if (optionalEl != null)
+			    optional = optionalEl.getAsBoolean();
 
-			AttributeDisjunction disjunction = new AttributeDisjunction(label);
+			AttributeDisjunction disjunction = new AttributeDisjunction(label, optional);
 
 			JsonElement attributes = object.get("attributes");
 			if (attributes.isJsonArray()) {

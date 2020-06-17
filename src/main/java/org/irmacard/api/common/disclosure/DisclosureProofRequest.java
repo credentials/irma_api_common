@@ -152,15 +152,16 @@ public class DisclosureProofRequest extends SessionRequest {
 			return result;
 		}
 		
+		// For each of the disjunctions, lookup attributes satisfying them
 		for (AttributeDisjunction disjunction : content) {
-			// For each of the disjunctions, lookup attributes satisfying them
 			for (AttributeIdentifier ai : disjunction) {
+				// Is this attribute given?
 				if (foundAttrs.containsKey(ai)) {
 					String value = foundAttrs.get(ai);
 					if (!disjunction.hasValues()) {	
 						disjunction.setSatisfied(true);
 						attributes.put(ai, value);
-						break;
+						break; // Done with disjunction
 					} else {
 						// If the request indicated that the attribute should have a specific value, then the containing
 						// disjunction is only satisfied if the actual value of the attribute is correct.
@@ -168,11 +169,15 @@ public class DisclosureProofRequest extends SessionRequest {
 						if (requiredValue.equals(value)) {
 							disjunction.setSatisfied(true);
 							attributes.put(ai, value);
-							break;
+							break; // Done with disjunction
 						}
 					}
 				}
 			}
+
+			// If it is optional, this disjunction is always satisfied
+			if (disjunction.isOptional())
+				disjunction.setSatisfied(true);
 		}
 
 		for (AttributeDisjunction disjunction : content)
